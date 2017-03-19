@@ -1,7 +1,6 @@
 package mktx
 
 import (
-	"fmt"
 	b58 "github.com/jbenet/go-base58"
 )
 
@@ -27,6 +26,16 @@ func PayToPubkeyScript(addr string) []byte {
 	if addr[0] == 't' {
 		pkval = pkval[1:]
 	}
-	fmt.Printf("%s = %x\n", addr, pkval)
 	return append(append([]byte{OP_DUP, OP_HASH160, byte(len(pkval))}, pkval...), OP_EQUALVERIFY, OP_CHECKSIG)
+}
+
+func PayToPubkeyAddr(script []byte) ([]byte, error) {
+	if len(script) < 6 {
+		return nil, nil
+	}
+	if script[0] != OP_DUP || script[1] != OP_HASH160 || script[len(script)-1] != OP_CHECKSIG || script[len(script)-2] != OP_EQUALVERIFY {
+		return nil, nil
+	}
+
+	return script[3 : len(script)-2], nil
 }
