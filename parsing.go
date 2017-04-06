@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/hex"
+	"errors"
 	"io"
 )
 
@@ -62,7 +63,7 @@ func readTx(r *bytes.Reader) (*Tx, error) {
 		return &out, nil
 	}
 
-	panic("usupported")
+	return nil, errors.New("non-version 1 of tx is not supported")
 	/*
 		nJoinSplit, err := readVarint(r)
 		if err != nil {
