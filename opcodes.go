@@ -1,6 +1,7 @@
 package mktx
 
 import (
+	"bytes"
 	b58 "github.com/jbenet/go-base58"
 )
 
@@ -13,6 +14,8 @@ const (
 
 	OP_CHECKSIG = 0xac
 	OP_HASH160  = 0xa9
+
+	OP_CHECKMULTISIG = 0xae
 )
 
 func OpReturnScript(val []byte) []byte {
@@ -38,4 +41,16 @@ func PayToPubkeyAddr(script []byte) ([]byte, error) {
 	}
 
 	return script[3 : len(script)-2], nil
+}
+
+func MakeMultisig(m, n int, pubks [][]byte) []byte {
+	out := new(bytes.Buffer)
+	out.WriteByte(byte(0x50 + m))
+	for _, k := range pubks {
+		out.WriteByte(byte(len(k)))
+		out.Write(k)
+	}
+	out.WriteByte(byte(0x50 + n))
+	out.WriteByte(OP_CHECKMULTISIG)
+	return out.Bytes()
 }
